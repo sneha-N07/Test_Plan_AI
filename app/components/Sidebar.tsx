@@ -97,17 +97,17 @@ export default function Sidebar() {
         </Link>
         <Link href="/test-scenario-agent" style={{ textDecoration: 'none', color: 'inherit' }}>
           <div className={`sidebar-item ${pathname === '/test-scenario-agent' ? 'active' : ''}`} style={{ color: 'white' }}>
-            <FileText size={18} color="#8b5cf6" /> Intelligent Test Scenario Gen Agent
+            <FileText size={18} color="#8b5cf6" /> Intelligent Test Scenario Agent
           </div>
         </Link>
         <Link href="/test-strategy-agent" style={{ textDecoration: 'none', color: 'inherit' }}>
           <div className={`sidebar-item ${pathname === '/test-strategy-agent' ? 'active' : ''}`} style={{ color: 'white' }}>
-            <Target size={18} color="#eab308" /> Intelligent Test Strategy Gen Agent
+            <Target size={18} color="#eab308" /> Intelligent Test Strategy Agent
           </div>
         </Link>
         <Link href="/test-case-agent" style={{ textDecoration: 'none', color: 'inherit' }}>
           <div className={`sidebar-item ${pathname === '/test-case-agent' ? 'active' : ''}`} style={{ color: 'white' }}>
-            <FileText size={18} color="#10b981" /> Intelligent Test Case Gen Agent
+            <FileText size={18} color="#10b981" /> Intelligent Test Case Agent
           </div>
         </Link>
       </aside>

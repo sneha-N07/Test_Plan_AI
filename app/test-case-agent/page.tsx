@@ -182,7 +182,7 @@ export default function TestCaseAgentPage() {
         <div className="page-title">
           <div style={{ padding: '8px', background: 'rgba(16, 185, 129, 0.1)', borderRadius: '8px', color: '#10b981' }}><FileText size={24} /></div>
           <div>
-            Intelligent Test Case Gen Agent
+            Intelligent Test Case Agent
             <p className="page-subtitle" style={{ margin: 0 }}>Generate test cases in CSV format from Jira or custom descriptions using AI</p>
           </div>
         </div>
@@ -324,11 +324,15 @@ export default function TestCaseAgentPage() {
         <div className="glass-panel">
           <h3>Ticket Information</h3>
           <p className="page-subtitle">Provide the Jira ticket ID (optional) OR custom descriptions</p>
+
+          <div style={{ padding: '12px', backgroundColor: 'rgba(59, 130, 246, 0.1)', color: '#3b82f6', borderRadius: '8px', marginBottom: '16px', fontSize: '13px' }}>
+            <strong>💡 Note:</strong> You can generate the specific docs by connecting a <strong>Jira Ticket ID</strong>, by adding a custom <strong>Description</strong>, or both. Neither field is mandatory on its own!
+          </div>
           
           <label className="label-field">Jira Ticket ID</label>
-          <input className="input-field" value={jiraTicketId} onChange={e=>setJiraTicketId(e.target.value)} placeholder="e.g. VWO-123 (Leave blank to use description only)" />
+          <input className="input-field" value={jiraTicketId} onChange={e=>setJiraTicketId(e.target.value)} placeholder="e.g. VWO-123" />
           
-          <label className="label-field">Additional Context & Description {jiraTicketId === '' ? '*' : ''}</label>
+          <label className="label-field">Additional Context & Description</label>
           <textarea className="input-field" rows={4} value={context} onChange={e=>setContext(e.target.value)} placeholder="Add feature details, specific testing focus, constraints..." />
 
           <div style={{ marginTop: '2rem', display: 'flex', gap: '1rem' }}>

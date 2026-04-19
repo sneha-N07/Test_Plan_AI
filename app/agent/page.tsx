@@ -118,19 +118,31 @@ export default function AgentPage() {
       setTestPlan(''); 
       setStep(3); // Now the Test Plan step
       
-      // 1. Fetch Ticket details first
-      const fetchRes = await fetch('/api/jira/fetch', {
-        method: 'POST', body: JSON.stringify({ url: jiraUrl, email: jiraEmail, apiToken: jiraToken, ticketId: jiraTicketId })
-      });
-      const fetchData = await fetchRes.json();
-      
-      if (!fetchData.success || !fetchData.issues || fetchData.issues.length === 0) {
-        setTestPlan("Error: Could not fetch Jira ticket information. " + (fetchData.error || "Ticket not found."));
-        return;
-      }
+      let finalContext = '';
 
-      const issue = fetchData.issues[0];
-      const finalContext = `ADDITIONAL NOTES: ${context}\n\nJIRA TICKET:\nID: ${issue.id}\nSummary: ${issue.summary}\nDescription: ${issue.description}`;
+      if (jiraTicketId.trim() !== '') {
+        // 1. Fetch Ticket details first if ID provided
+        const fetchRes = await fetch('/api/jira/fetch', {
+          method: 'POST', body: JSON.stringify({ url: jiraUrl, email: jiraEmail, apiToken: jiraToken, ticketId: jiraTicketId })
+        });
+        const fetchData = await fetchRes.json();
+        
+        if (!fetchData.success || !fetchData.issues || fetchData.issues.length === 0) {
+          setTestPlan("Error: Could not fetch Jira ticket information. " + (fetchData.error || "Ticket not found."));
+          setLoading(false);
+          return;
+        }
+
+        const issue = fetchData.issues[0];
+        finalContext = `ADDITIONAL NOTES: ${context}\n\nJIRA TICKET:\nID: ${issue.id}\nSummary: ${issue.summary}\nDescription: ${issue.description}`;
+      } else {
+        if (!context || context.trim() === '') {
+          setTestPlan("Error: You must provide a Jira ticket ID or a description/context.");
+          setLoading(false);
+          return;
+        }
+        finalContext = `TICKET DESCRIPTION & DETAILS: ${context}`;
+      }
       
       // 2. Call LLM to generate plan
       const genRes = await fetch('/api/llm/generate', {
@@ -312,19 +324,23 @@ export default function AgentPage() {
       {step === 2 && (
         <div className="glass-panel">
           <h3>Ticket Information</h3>
-          <p className="page-subtitle">Provide the Jira ticket ID and any additional context for the test plan</p>
+          <p className="page-subtitle">Provide the Jira ticket ID (optional) OR custom descriptions</p>
+
+          <div style={{ padding: '12px', backgroundColor: 'rgba(59, 130, 246, 0.1)', color: '#3b82f6', borderRadius: '8px', marginBottom: '16px', fontSize: '13px' }}>
+            <strong>💡 Note:</strong> You can generate the specific docs by connecting a <strong>Jira Ticket ID</strong>, by adding a custom <strong>Description</strong>, or both. Neither field is mandatory on its own!
+          </div>
           
-          <label className="label-field">Jira Ticket ID *</label>
+          <label className="label-field">Jira Ticket ID (Optional)</label>
           <input className="input-field" value={jiraTicketId} onChange={e=>setJiraTicketId(e.target.value)} placeholder="e.g. VWO-123" />
           
-          <label className="label-field">Additional Context & Notes</label>
+          <label className="label-field">Additional Context & Description (Optional)</label>
           <textarea className="input-field" rows={4} value={context} onChange={e=>setContext(e.target.value)} placeholder="Add specific testing focus, constraints, or feature highlights..." />
 
           <div style={{ marginTop: '2rem', display: 'flex', gap: '1rem' }}>
             <button className="btn-secondary" style={{ flex: 1 }} onClick={() => setStep(1)} disabled={loading}>
                Back to Setup
             </button>
-            <button className="btn-primary" style={{ flex: 2 }} onClick={generatePlan} disabled={!jiraTicketId || loading}>
+            <button className="btn-primary" style={{ flex: 2 }} onClick={generatePlan} disabled={(!jiraTicketId && !context) || loading}>
                {loading ? <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}><Loader2 className="animate-spin" /> Processing...</div> : 'Generate Test Plan'}
             </button>
           </div>
