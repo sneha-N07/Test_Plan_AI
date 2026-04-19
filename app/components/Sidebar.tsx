@@ -38,14 +38,38 @@ export default function Sidebar() {
       setJiraToken(localStorage.getItem('jiraToken') || '');
       setLlmProvider(localStorage.getItem('llmProvider') || 'Ollama');
       setLlmBaseUrl(localStorage.getItem('llmBaseUrl') || '');
-      setLlmKey(localStorage.getItem('llmKey') || '');
       setLlmModel(localStorage.getItem('llmModel') || 'llama3');
       
-      // Reset statuses on open
-      setJiraTestStatus(''); setJiraTestSuccess(null);
-      setLlmTestStatus(''); setLlmTestSuccess(null);
+      // Load connected states if they exist
+      if (localStorage.getItem('jiraIsConnected') === 'true') {
+        setJiraTestSuccess(true);
+        setJiraTestStatus('');
+      } else {
+        setJiraTestStatus(''); setJiraTestSuccess(null);
+      }
+
+      if (localStorage.getItem('llmIsConnected') === 'true') {
+        setLlmTestSuccess(true);
+        setLlmTestStatus('');
+      } else {
+        setLlmTestStatus(''); setLlmTestSuccess(null);
+      }
     }
   }, [isProfileOpen]);
+
+  const handleJiraChange = (setter: any, value: string) => {
+    setter(value);
+    setJiraTestSuccess(null);
+    setJiraTestStatus('');
+    localStorage.removeItem('jiraIsConnected');
+  };
+
+  const handleLlmChange = (setter: any, value: string) => {
+    setter(value);
+    setLlmTestSuccess(null);
+    setLlmTestStatus('');
+    localStorage.removeItem('llmIsConnected');
+  };
 
   const testJira = async () => {
     try {
@@ -57,13 +81,16 @@ export default function Sidebar() {
       if (data.success) {
         setJiraTestStatus(`Jira OK! Welcome ${data.name}`);
         setJiraTestSuccess(true);
+        localStorage.setItem('jiraIsConnected', 'true');
       } else {
         setJiraTestStatus(`Error: ${data.error}`);
         setJiraTestSuccess(false);
+        localStorage.removeItem('jiraIsConnected');
       }
     } catch (e: any) { 
       setJiraTestStatus('Connection failed');
       setJiraTestSuccess(false);
+      localStorage.removeItem('jiraIsConnected');
     }
     finally { setLoading(false); }
   };
@@ -74,12 +101,19 @@ export default function Sidebar() {
       const res = await fetch('/api/llm/test', {
         method: 'POST', body: JSON.stringify({ provider: llmProvider, baseUrl: llmBaseUrl, apiKey: llmKey, model: llmModel })
       });
-      const data = await res.json();
-      setLlmTestStatus(data.success ? 'LLM OK!' : `Error: ${data.error}`);
-      setLlmTestSuccess(data.success);
+      if (data.success) {
+        setLlmTestStatus('LLM OK!');
+        setLlmTestSuccess(true);
+        localStorage.setItem('llmIsConnected', 'true');
+      } else {
+        setLlmTestStatus(`Error: ${data.error}`);
+        setLlmTestSuccess(false);
+        localStorage.removeItem('llmIsConnected');
+      }
     } catch (e: any) { 
       setLlmTestStatus('Connection failed');
       setLlmTestSuccess(false);
+      localStorage.removeItem('llmIsConnected');
     }
     finally { setLoading(false); }
   };
@@ -206,7 +240,7 @@ export default function Sidebar() {
                 <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '10px', marginBottom: '10px' }}>
                   <div>
                     <label style={{ fontSize: '12px', color: 'var(--text-secondary)', display: 'block', marginBottom: '4px' }}>Provider</label>
-                    <select className="input-field" style={{ padding: '8px', width: '100%' }} value={llmProvider} onChange={e=>setLlmProvider(e.target.value)}>
+                    <select className="input-field" style={{ padding: '8px', width: '100%' }} value={llmProvider} onChange={e=>handleLlmChange(setLlmProvider, e.target.value)}>
                       <option value="Ollama">Ollama (Local)</option>
                       <option value="GROQ">GROQ</option>
                       <option value="Grok">Grok</option>
@@ -214,13 +248,14 @@ export default function Sidebar() {
                   </div>
                   <div>
                     <label style={{ fontSize: '12px', color: 'var(--text-secondary)', display: 'block', marginBottom: '4px' }}>Model Name</label>
-                    <input className="input-field" style={{ padding: '8px', width: '100%' }} value={llmModel} onChange={e=>setLlmModel(e.target.value)} placeholder="e.g. llama3" />
+                    <input className="input-field" style={{ padding: '8px', width: '100%' }} value={llmModel} onChange={e=>handleLlmChange(setLlmModel, e.target.value)} placeholder="e.g. llama3" />
                   </div>
                 </div>
                 <div style={{ marginBottom: '10px' }}>
                   <label style={{ fontSize: '12px', color: 'var(--text-secondary)', display: 'block', marginBottom: '4px' }}>API Key / Base URL</label>
                   <input className="input-field" style={{ padding: '8px', width: '100%' }} type="password" value={llmProvider === 'Ollama' ? llmBaseUrl : llmKey} onChange={e=>{
-                    if(llmProvider === 'Ollama') setLlmBaseUrl(e.target.value); else setLlmKey(e.target.value);
+                    if(llmProvider === 'Ollama') handleLlmChange(setLlmBaseUrl, e.target.value); 
+                    else handleLlmChange(setLlmKey, e.target.value);
                   }} placeholder="Token or backend URL" />
                 </div>
                 
@@ -250,16 +285,16 @@ export default function Sidebar() {
                 </h3>
                 <div style={{ marginBottom: '10px' }}>
                   <label style={{ fontSize: '12px', color: 'var(--text-secondary)', display: 'block', marginBottom: '4px' }}>Jira URL</label>
-                  <input className="input-field" style={{ padding: '8px', width: '100%' }} value={jiraUrl} onChange={e=>setJiraUrl(e.target.value)} placeholder="https://your-domain.atlassian.net" />
+                  <input className="input-field" style={{ padding: '8px', width: '100%' }} value={jiraUrl} onChange={e=>handleJiraChange(setJiraUrl, e.target.value)} placeholder="https://your-domain.atlassian.net" />
                 </div>
                 <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '10px' }}>
                   <div>
                     <label style={{ fontSize: '12px', color: 'var(--text-secondary)', display: 'block', marginBottom: '4px' }}>Jira Email</label>
-                    <input className="input-field" style={{ padding: '8px', width: '100%' }} value={jiraEmail} onChange={e=>setJiraEmail(e.target.value)} placeholder="email@company.com" />
+                    <input className="input-field" style={{ padding: '8px', width: '100%' }} value={jiraEmail} onChange={e=>handleJiraChange(setJiraEmail, e.target.value)} placeholder="email@company.com" />
                   </div>
                   <div>
                     <label style={{ fontSize: '12px', color: 'var(--text-secondary)', display: 'block', marginBottom: '4px' }}>API Token</label>
-                    <input type="password" className="input-field" style={{ padding: '8px', width: '100%' }} value={jiraToken} onChange={e=>setJiraToken(e.target.value)} placeholder="Jira tokens" />
+                    <input type="password" className="input-field" style={{ padding: '8px', width: '100%' }} value={jiraToken} onChange={e=>handleJiraChange(setJiraToken, e.target.value)} placeholder="Jira tokens" />
                   </div>
                 </div>
 
