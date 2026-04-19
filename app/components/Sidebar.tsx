@@ -8,41 +8,53 @@ import { LayoutDashboard, Users, Settings, Briefcase, ChevronDown, X, ExternalLi
 export default function Sidebar() {
   const pathname = usePathname();
   const [isProfileOpen, setIsProfileOpen] = useState(false);
-  const [profile, setProfile] = useState({
-    name: 'User',
-    email: '',
-    url: '',
-    provider: '',
-    model: ''
-  });
+  
+  // Profile settings
   const [editedName, setEditedName] = useState('');
+  
+  // Jira settings
+  const [jiraUrl, setJiraUrl] = useState('');
+  const [jiraEmail, setJiraEmail] = useState('');
+  const [jiraToken, setJiraToken] = useState('');
+  
+  // LLM settings
+  const [llmProvider, setLlmProvider] = useState('Ollama');
+  const [llmBaseUrl, setLlmBaseUrl] = useState('');
+  const [llmKey, setLlmKey] = useState('');
+  const [llmModel, setLlmModel] = useState('llama3');
 
   useEffect(() => {
-    const updateProfile = () => {
-      const name = localStorage.getItem('jiraDisplayName') || 'Guest User';
-      setProfile({
-        name: name,
-        email: localStorage.getItem('jiraEmail') || 'Not Connected',
-        url: localStorage.getItem('jiraUrl') || '',
-        provider: localStorage.getItem('llmProvider') || 'None',
-        model: localStorage.getItem('llmModel') || 'None'
-      });
-      setEditedName(name);
-    };
-    updateProfile();
-    window.addEventListener('storage', updateProfile);
-    return () => window.removeEventListener('storage', updateProfile);
+    if (isProfileOpen) {
+      setEditedName(localStorage.getItem('jiraDisplayName') || 'Guest User');
+      setJiraUrl(localStorage.getItem('jiraUrl') || '');
+      setJiraEmail(localStorage.getItem('jiraEmail') || '');
+      setJiraToken(localStorage.getItem('jiraToken') || '');
+      setLlmProvider(localStorage.getItem('llmProvider') || 'Ollama');
+      setLlmBaseUrl(localStorage.getItem('llmBaseUrl') || '');
+      setLlmKey(localStorage.getItem('llmKey') || '');
+      setLlmModel(localStorage.getItem('llmModel') || 'llama3');
+    }
   }, [isProfileOpen]);
 
-  const handleSaveName = () => {
+  const handleSaveSettings = () => {
     localStorage.setItem('jiraDisplayName', editedName);
-    setProfile((prev: any) => ({ ...prev, name: editedName }));
+    localStorage.setItem('jiraUrl', jiraUrl);
+    localStorage.setItem('jiraEmail', jiraEmail);
+    localStorage.setItem('jiraToken', jiraToken);
+    localStorage.setItem('llmProvider', llmProvider);
+    localStorage.setItem('llmBaseUrl', llmBaseUrl);
+    localStorage.setItem('llmKey', llmKey);
+    localStorage.setItem('llmModel', llmModel);
+    
+    // Dispatch a dummy storage event so other tabs sync up
+    window.dispatchEvent(new Event('storage'));
+    setIsProfileOpen(false);
   };
 
   const menuItems = [
     { id: '/', icon: LayoutDashboard, label: 'Dashboard' },
     { id: '/curriculum', icon: Users, label: 'Curriculum' },
-    { id: 'Settings', icon: Settings, label: 'Settings' }
+    { id: 'Settings', icon: Settings, label: 'Global Setup' }
   ];
 
   return (
@@ -115,20 +127,20 @@ export default function Sidebar() {
       {/* Profile Modal */}
       {isProfileOpen && (
         <div className="modal-overlay" onClick={() => setIsProfileOpen(false)}>
-          <div className="profile-modal" onClick={e => e.stopPropagation()}>
+          <div className="profile-modal" style={{ width: '500px', maxHeight: '90vh', overflowY: 'auto' }} onClick={e => e.stopPropagation()}>
             <div className="profile-header">
-              <div style={{ display: 'flex', alignItems: 'center', gap: '15px' }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '15px', flex: 1 }}>
                 <div className="profile-avatar">
-                  {profile.name.charAt(0)}
+                  {(editedName || 'G').charAt(0).toUpperCase()}
                 </div>
-                <div>
+                <div style={{ flex: 1, marginRight: '20px' }}>
                   <input 
                     className="name-input"
                     value={editedName}
                     onChange={(e) => setEditedName(e.target.value)}
-                    placeholder="Enter name..."
+                    placeholder="Enter User Name..."
                   />
-                  <p style={{ margin: 0, fontSize: '13px', opacity: 0.7 }}>{profile.email}</p>
+                  <p style={{ margin: 0, fontSize: '13px', opacity: 0.8 }}>Global Profile & Connection Setup</p>
                 </div>
               </div>
               <button className="close-btn" onClick={() => setIsProfileOpen(false)}>
@@ -136,42 +148,61 @@ export default function Sidebar() {
               </button>
             </div>
 
-            <div className="profile-body">
+            <div className="profile-body" style={{ padding: '24px' }}>
+              
               <div className="info-section">
-                <h3><Briefcase size={16} /> Jira Connection</h3>
-                <div className="info-row">
-                  <span className="info-label">Domain</span>
-                  <span className="info-value">{profile.url || 'Not set'}</span>
+                <h3><ShieldCheck size={16} /> LLM Connection Setup</h3>
+                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '10px', marginBottom: '10px' }}>
+                  <div>
+                    <label style={{ fontSize: '12px', color: 'var(--text-secondary)', display: 'block', marginBottom: '4px' }}>Provider</label>
+                    <select className="input-field" style={{ padding: '8px', width: '100%' }} value={llmProvider} onChange={e=>setLlmProvider(e.target.value)}>
+                      <option value="Ollama">Ollama (Local)</option>
+                      <option value="GROQ">GROQ</option>
+                      <option value="Grok">Grok</option>
+                    </select>
+                  </div>
+                  <div>
+                    <label style={{ fontSize: '12px', color: 'var(--text-secondary)', display: 'block', marginBottom: '4px' }}>Model Name</label>
+                    <input className="input-field" style={{ padding: '8px', width: '100%' }} value={llmModel} onChange={e=>setLlmModel(e.target.value)} placeholder="e.g. llama3" />
+                  </div>
                 </div>
-                <div className="info-row">
-                  <span className="info-label">Status</span>
-                  <span className="status-badge connected">Connected ✅</span>
+                <div style={{ marginBottom: '10px' }}>
+                  <label style={{ fontSize: '12px', color: 'var(--text-secondary)', display: 'block', marginBottom: '4px' }}>API Key / Base URL</label>
+                  <input className="input-field" style={{ padding: '8px', width: '100%' }} type="password" value={llmProvider === 'Ollama' ? llmBaseUrl : llmKey} onChange={e=>{
+                    if(llmProvider === 'Ollama') setLlmBaseUrl(e.target.value); else setLlmKey(e.target.value);
+                  }} placeholder="Token or backend URL" />
                 </div>
               </div>
 
-              <div className="info-section">
-                <h3><ShieldCheck size={16} /> LLM Integration</h3>
-                <div className="info-row">
-                  <span className="info-label">Provider</span>
-                  <span className="info-value">{profile.provider}</span>
+              <div className="info-section" style={{ marginTop: '20px' }}>
+                <h3><Briefcase size={16} /> Jira Connection Setup</h3>
+                <div style={{ marginBottom: '10px' }}>
+                  <label style={{ fontSize: '12px', color: 'var(--text-secondary)', display: 'block', marginBottom: '4px' }}>Jira URL</label>
+                  <input className="input-field" style={{ padding: '8px', width: '100%' }} value={jiraUrl} onChange={e=>setJiraUrl(e.target.value)} placeholder="https://your-domain.atlassian.net" />
                 </div>
-                <div className="info-row">
-                  <span className="info-label">Model</span>
-                  <span className="info-value">{profile.model}</span>
+                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '10px' }}>
+                  <div>
+                    <label style={{ fontSize: '12px', color: 'var(--text-secondary)', display: 'block', marginBottom: '4px' }}>Jira Email</label>
+                    <input className="input-field" style={{ padding: '8px', width: '100%' }} value={jiraEmail} onChange={e=>setJiraEmail(e.target.value)} placeholder="email@company.com" />
+                  </div>
+                  <div>
+                    <label style={{ fontSize: '12px', color: 'var(--text-secondary)', display: 'block', marginBottom: '4px' }}>API Token</label>
+                    <input type="password" className="input-field" style={{ padding: '8px', width: '100%' }} value={jiraToken} onChange={e=>setJiraToken(e.target.value)} placeholder="Jira tokens" />
+                  </div>
                 </div>
               </div>
 
               <div style={{ marginTop: '20px', padding: '15px', backgroundColor: 'rgba(59, 130, 246, 0.1)', borderRadius: '8px', fontSize: '13px' }}>
-                <p style={{ margin: 0 }}>Setting details are saved locally in your browser for security.</p>
+                <p style={{ margin: 0, color: '#3b82f6' }}><strong>💡 Note:</strong> Configure these settings globally here to use them instantly across all AI Agents without needing to re-enter them on each screen.</p>
               </div>
             </div>
 
-            <div className="profile-footer" style={{ display: 'flex', gap: '10px' }}>
+            <div className="profile-footer" style={{ display: 'flex', gap: '10px', padding: '24px', borderTop: '1px solid var(--border-color)' }}>
               <button className="btn-secondary" style={{ flex: 1 }} onClick={() => setIsProfileOpen(false)}>
                 Cancel
               </button>
-              <button className="btn-primary" style={{ flex: 2 }} onClick={() => { handleSaveName(); setIsProfileOpen(false); }}>
-                Save Changes
+              <button className="btn-primary" style={{ flex: 2 }} onClick={handleSaveSettings}>
+                Save Global Settings
               </button>
             </div>
           </div>
