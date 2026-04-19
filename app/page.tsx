@@ -17,7 +17,8 @@ import {
   FileText,
   Trash2,
   Calendar,
-  Target
+  Target,
+  History
 } from 'lucide-react';
 
 export default function Dashboard() {
@@ -89,7 +90,14 @@ export default function Dashboard() {
       </header>
 
       <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: '20px', marginBottom: '40px' }}>
-        <StatCard icon={Briefcase} label="Plans Generated" value={stats.plansGenerated} color="#3b82f6" />
+        <div 
+          onClick={() => history.length > 0 && setIsHistoryOpen(true)}
+          style={{ cursor: history.length > 0 ? 'pointer' : 'default', opacity: history.length > 0 ? 1 : 0.6, transition: 'all 0.2s', transform: 'scale(1)' }}
+          onMouseOver={(e) => { if(history.length > 0) e.currentTarget.style.transform = 'scale(1.02)'; }}
+          onMouseOut={(e) => { e.currentTarget.style.transform = 'scale(1)'; }}
+        >
+          <StatCard icon={History} label="View Activity" value={`${history.length} Logs`} color="#eab308" />
+        </div>
         <StatCard icon={CheckCircle2} label="Jira Status" value={stats.jiraStatus} color={stats.jiraStatus === 'Connected' ? '#10b981' : '#f59e0b'} />
         <StatCard icon={Zap} label="AI Engine" value={stats.llmStatus} color={stats.llmStatus === 'Active' ? '#10b981' : '#f59e0b'} />
         <StatCard icon={Clock} label="Last Active" value={stats.lastGenerated} color="#8b5cf6" />
@@ -141,18 +149,6 @@ export default function Dashboard() {
                 <ArrowRight size={16} className="arrow" />
               </div>
             </Link>
-            <div 
-              className={`action-card ${history.length === 0 ? 'disabled' : ''}`} 
-              onClick={() => history.length > 0 && setIsHistoryOpen(true)}
-              style={{ cursor: history.length > 0 ? 'pointer' : 'default', opacity: history.length > 0 ? 1 : 0.6, gridColumn: 'span 2' }}
-            >
-              <div className="action-icon" style={{ backgroundColor: '#f59e0b' }}><LayoutDashboard size={20} /></div>
-              <div>
-                <div className="action-title">View Activity</div>
-                <div className="action-desc">Review previous generations</div>
-              </div>
-              <ArrowRight size={16} className="arrow" />
-            </div>
           </div>
         </div>
 
