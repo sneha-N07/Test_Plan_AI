@@ -38,6 +38,7 @@ export default function Sidebar() {
       setJiraToken(localStorage.getItem('jiraToken') || '');
       setLlmProvider(localStorage.getItem('llmProvider') || 'Ollama');
       setLlmBaseUrl(localStorage.getItem('llmBaseUrl') || '');
+      setLlmKey(localStorage.getItem('llmKey') || '');
       setLlmModel(localStorage.getItem('llmModel') || 'llama3');
       
       // Load connected states if they exist
@@ -101,6 +102,7 @@ export default function Sidebar() {
       const res = await fetch('/api/llm/test', {
         method: 'POST', body: JSON.stringify({ provider: llmProvider, baseUrl: llmBaseUrl, apiKey: llmKey, model: llmModel })
       });
+      const data = await res.json();
       if (data.success) {
         setLlmTestStatus('LLM OK!');
         setLlmTestSuccess(true);
