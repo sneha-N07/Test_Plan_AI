@@ -23,6 +23,13 @@ export default function Sidebar() {
   const [llmKey, setLlmKey] = useState('');
   const [llmModel, setLlmModel] = useState('llama3');
 
+  // Test UI State
+  const [loading, setLoading] = useState(false);
+  const [jiraTestStatus, setJiraTestStatus] = useState('');
+  const [jiraTestSuccess, setJiraTestSuccess] = useState<boolean | null>(null);
+  const [llmTestStatus, setLlmTestStatus] = useState('');
+  const [llmTestSuccess, setLlmTestSuccess] = useState<boolean | null>(null);
+
   useEffect(() => {
     if (isProfileOpen) {
       setEditedName(localStorage.getItem('jiraDisplayName') || 'Guest User');
@@ -33,8 +40,49 @@ export default function Sidebar() {
       setLlmBaseUrl(localStorage.getItem('llmBaseUrl') || '');
       setLlmKey(localStorage.getItem('llmKey') || '');
       setLlmModel(localStorage.getItem('llmModel') || 'llama3');
+      
+      // Reset statuses on open
+      setJiraTestStatus(''); setJiraTestSuccess(null);
+      setLlmTestStatus(''); setLlmTestSuccess(null);
     }
   }, [isProfileOpen]);
+
+  const testJira = async () => {
+    try {
+      setLoading(true); setJiraTestStatus('Testing...'); setJiraTestSuccess(null);
+      const res = await fetch('/api/jira/test', {
+        method: 'POST', body: JSON.stringify({ url: jiraUrl, email: jiraEmail, apiToken: jiraToken })
+      });
+      const data = await res.json();
+      if (data.success) {
+        setJiraTestStatus(`Jira OK! Welcome ${data.name}`);
+        setJiraTestSuccess(true);
+      } else {
+        setJiraTestStatus(`Error: ${data.error}`);
+        setJiraTestSuccess(false);
+      }
+    } catch (e: any) { 
+      setJiraTestStatus('Connection failed');
+      setJiraTestSuccess(false);
+    }
+    finally { setLoading(false); }
+  };
+
+  const testLlm = async () => {
+    try {
+      setLoading(true); setLlmTestStatus('Testing...'); setLlmTestSuccess(null);
+      const res = await fetch('/api/llm/test', {
+        method: 'POST', body: JSON.stringify({ provider: llmProvider, baseUrl: llmBaseUrl, apiKey: llmKey, model: llmModel })
+      });
+      const data = await res.json();
+      setLlmTestStatus(data.success ? 'LLM OK!' : `Error: ${data.error}`);
+      setLlmTestSuccess(data.success);
+    } catch (e: any) { 
+      setLlmTestStatus('Connection failed');
+      setLlmTestSuccess(false);
+    }
+    finally { setLoading(false); }
+  };
 
   const handleSaveSettings = () => {
     localStorage.setItem('jiraDisplayName', editedName);
@@ -172,6 +220,24 @@ export default function Sidebar() {
                     if(llmProvider === 'Ollama') setLlmBaseUrl(e.target.value); else setLlmKey(e.target.value);
                   }} placeholder="Token or backend URL" />
                 </div>
+                
+                <button 
+                  className="btn-primary" 
+                  style={{ marginTop: '0.5rem', width: '100%', backgroundColor: '#2563eb', padding: '8px' }} 
+                  onClick={testLlm} 
+                  disabled={loading}
+                >
+                  {loading ? 'Testing...' : 'Test LLM Connection'}
+                </button>
+                {llmTestStatus && (
+                  <div style={{ 
+                    marginTop: '0.75rem', padding: '0.5rem', borderRadius: '6px', fontSize: '12px', fontWeight: '500',
+                    backgroundColor: llmTestSuccess === true ? 'rgba(16, 185, 129, 0.1)' : llmTestSuccess === false ? 'rgba(239, 68, 68, 0.1)' : 'rgba(0,0,0,0.05)',
+                    color: llmTestSuccess === true ? '#10b981' : llmTestSuccess === false ? 'var(--error-color)' : 'var(--text-secondary)'
+                  }}>
+                    {llmTestStatus}
+                  </div>
+                )}
               </div>
 
               <div className="info-section" style={{ marginTop: '20px' }}>
@@ -190,6 +256,24 @@ export default function Sidebar() {
                     <input type="password" className="input-field" style={{ padding: '8px', width: '100%' }} value={jiraToken} onChange={e=>setJiraToken(e.target.value)} placeholder="Jira tokens" />
                   </div>
                 </div>
+
+                <button 
+                  className="btn-primary" 
+                  style={{ marginTop: '1rem', width: '100%', backgroundColor: '#2563eb', padding: '8px' }} 
+                  onClick={testJira} 
+                  disabled={loading}
+                >
+                  {loading ? 'Testing...' : 'Test Jira Connection'}
+                </button>
+                {jiraTestStatus && (
+                  <div style={{ 
+                    marginTop: '0.75rem', padding: '0.5rem', borderRadius: '6px', fontSize: '12px', fontWeight: '500',
+                    backgroundColor: jiraTestSuccess === true ? 'rgba(16, 185, 129, 0.1)' : jiraTestSuccess === false ? 'rgba(239, 68, 68, 0.1)' : 'rgba(0,0,0,0.05)',
+                    color: jiraTestSuccess === true ? '#10b981' : jiraTestSuccess === false ? 'var(--error-color)' : 'var(--text-secondary)'
+                  }}>
+                    {jiraTestStatus}
+                  </div>
+                )}
               </div>
 
               <div style={{ marginTop: '20px', padding: '15px', backgroundColor: 'rgba(59, 130, 246, 0.1)', borderRadius: '8px', fontSize: '13px' }}>
