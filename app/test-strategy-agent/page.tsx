@@ -183,7 +183,7 @@ export default function TestStrategyAgentPage() {
           <div style={{ padding: '8px', background: 'rgba(234, 179, 8, 0.1)', borderRadius: '8px', color: '#eab308' }}><Target size={24} /></div>
           <div>
             Intelligent Test Strategy Agent
-            <p className="page-subtitle" style={{ margin: 0 }}>Generate test strategies in MarkDown format from Jira or custom descriptions using AI</p>
+            <p className="page-subtitle" style={{ margin: 0 }}>Generate comprehensive test strategies from Jira or custom descriptions using AI</p>
           </div>
         </div>
         <button className="btn-secondary" style={{ display: 'flex', gap: '8px' }} onClick={() => {

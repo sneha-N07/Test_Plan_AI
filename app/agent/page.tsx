@@ -184,7 +184,7 @@ export default function AgentPage() {
           <div style={{ padding: '8px', background: 'rgba(37,99,235,0.1)', borderRadius: '8px', color: '#2563eb' }}><Target size={24} /></div>
           <div>
             Intelligent Test Planning Agent
-            <p className="page-subtitle" style={{ margin: 0 }}>Generate comprehensive test plans from Jira requirements using AI</p>
+            <p className="page-subtitle" style={{ margin: 0 }}>Generate comprehensive test plans from Jira requirements or custom descriptions using AI</p>
           </div>
         </div>
         <button className="btn-secondary" style={{ display: 'flex', gap: '8px' }} onClick={() => {
