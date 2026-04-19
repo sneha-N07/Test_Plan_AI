@@ -16,7 +16,8 @@ import {
   X,
   FileText,
   Trash2,
-  Calendar
+  Calendar,
+  Target
 } from 'lucide-react';
 
 export default function Dashboard() {
@@ -130,10 +131,20 @@ export default function Dashboard() {
                 <ArrowRight size={16} className="arrow" />
               </div>
             </Link>
+            <Link href="/test-strategy-agent" style={{ textDecoration: 'none' }}>
+              <div className="action-card">
+                <div className="action-icon" style={{ backgroundColor: '#eab308' }}><Target size={20} /></div>
+                <div>
+                  <div className="action-title">Generate Test Strategy</div>
+                  <div className="action-desc">Create Test Strategy with AI</div>
+                </div>
+                <ArrowRight size={16} className="arrow" />
+              </div>
+            </Link>
             <div 
               className={`action-card ${history.length === 0 ? 'disabled' : ''}`} 
               onClick={() => history.length > 0 && setIsHistoryOpen(true)}
-              style={{ cursor: history.length > 0 ? 'pointer' : 'default', opacity: history.length > 0 ? 1 : 0.6 }}
+              style={{ cursor: history.length > 0 ? 'pointer' : 'default', opacity: history.length > 0 ? 1 : 0.6, gridColumn: 'span 2' }}
             >
               <div className="action-icon" style={{ backgroundColor: '#f59e0b' }}><LayoutDashboard size={20} /></div>
               <div>

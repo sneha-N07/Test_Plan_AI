@@ -3,7 +3,7 @@
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { LayoutDashboard, Users, Settings, Briefcase, ChevronDown, X, ExternalLink, Mail, ShieldCheck, FileText } from 'lucide-react';
+import { LayoutDashboard, Users, Settings, Briefcase, ChevronDown, X, ExternalLink, Mail, ShieldCheck, FileText, Target } from 'lucide-react';
 
 export default function Sidebar() {
   const pathname = usePathname();
@@ -98,6 +98,11 @@ export default function Sidebar() {
         <Link href="/test-scenario-agent" style={{ textDecoration: 'none', color: 'inherit' }}>
           <div className={`sidebar-item ${pathname === '/test-scenario-agent' ? 'active' : ''}`} style={{ color: 'white' }}>
             <FileText size={18} color="#8b5cf6" /> Intelligent Test Scenario Gen Agent
+          </div>
+        </Link>
+        <Link href="/test-strategy-agent" style={{ textDecoration: 'none', color: 'inherit' }}>
+          <div className={`sidebar-item ${pathname === '/test-strategy-agent' ? 'active' : ''}`} style={{ color: 'white' }}>
+            <Target size={18} color="#eab308" /> Intelligent Test Strategy Gen Agent
           </div>
         </Link>
         <Link href="/test-case-agent" style={{ textDecoration: 'none', color: 'inherit' }}>
