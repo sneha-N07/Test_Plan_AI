@@ -90,16 +90,16 @@ export default function Dashboard() {
       </header>
 
       <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: '20px', marginBottom: '40px' }}>
+        <StatCard icon={CheckCircle2} label="Jira Status" value={stats.jiraStatus} color={stats.jiraStatus === 'Connected' ? '#10b981' : '#f59e0b'} />
+        <StatCard icon={Zap} label="AI Engine" value={stats.llmStatus} color={stats.llmStatus === 'Active' ? '#10b981' : '#f59e0b'} />
         <div 
           onClick={() => history.length > 0 && setIsHistoryOpen(true)}
           style={{ cursor: history.length > 0 ? 'pointer' : 'default', opacity: history.length > 0 ? 1 : 0.6, transition: 'all 0.2s', transform: 'scale(1)' }}
           onMouseOver={(e) => { if(history.length > 0) e.currentTarget.style.transform = 'scale(1.02)'; }}
           onMouseOut={(e) => { e.currentTarget.style.transform = 'scale(1)'; }}
         >
-          <StatCard icon={History} label="View Activity" value={`${history.length} Logs`} color="#eab308" />
+          <StatCard icon={History} label="History" value={`${history.length} Logs`} color="#eab308" />
         </div>
-        <StatCard icon={CheckCircle2} label="Jira Status" value={stats.jiraStatus} color={stats.jiraStatus === 'Connected' ? '#10b981' : '#f59e0b'} />
-        <StatCard icon={Zap} label="AI Engine" value={stats.llmStatus} color={stats.llmStatus === 'Active' ? '#10b981' : '#f59e0b'} />
         <StatCard icon={Clock} label="Last Active" value={stats.lastGenerated} color="#8b5cf6" />
       </div>
 
