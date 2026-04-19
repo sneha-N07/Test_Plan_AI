@@ -95,6 +95,11 @@ export default function Sidebar() {
             <Briefcase size={18} color="#ef4444" /> Intelligent Test Planning Agent
           </div>
         </Link>
+        <Link href="/test-scenario-agent" style={{ textDecoration: 'none', color: 'inherit' }}>
+          <div className={`sidebar-item ${pathname === '/test-scenario-agent' ? 'active' : ''}`} style={{ color: 'white' }}>
+            <FileText size={18} color="#8b5cf6" /> Intelligent Test Scenario Gen Agent
+          </div>
+        </Link>
         <Link href="/test-case-agent" style={{ textDecoration: 'none', color: 'inherit' }}>
           <div className={`sidebar-item ${pathname === '/test-case-agent' ? 'active' : ''}`} style={{ color: 'white' }}>
             <FileText size={18} color="#10b981" /> Intelligent Test Case Gen Agent
