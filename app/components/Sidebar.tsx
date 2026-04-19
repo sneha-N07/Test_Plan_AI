@@ -199,7 +199,10 @@ export default function Sidebar() {
             <div className="profile-body" style={{ padding: '24px' }}>
               
               <div className="info-section">
-                <h3><ShieldCheck size={16} /> LLM Connection Setup</h3>
+                <h3 style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                  <ShieldCheck size={16} /> LLM Connection Setup
+                  {llmTestSuccess && <span className="status-badge connected" style={{ marginLeft: 'auto' }}>Connected ✅</span>}
+                </h3>
                 <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '10px', marginBottom: '10px' }}>
                   <div>
                     <label style={{ fontSize: '12px', color: 'var(--text-secondary)', display: 'block', marginBottom: '4px' }}>Provider</label>
@@ -241,7 +244,10 @@ export default function Sidebar() {
               </div>
 
               <div className="info-section" style={{ marginTop: '20px' }}>
-                <h3><Briefcase size={16} /> Jira Connection Setup</h3>
+                <h3 style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                  <Briefcase size={16} /> Jira Connection Setup
+                  {jiraTestSuccess && <span className="status-badge connected" style={{ marginLeft: 'auto' }}>Connected ✅</span>}
+                </h3>
                 <div style={{ marginBottom: '10px' }}>
                   <label style={{ fontSize: '12px', color: 'var(--text-secondary)', display: 'block', marginBottom: '4px' }}>Jira URL</label>
                   <input className="input-field" style={{ padding: '8px', width: '100%' }} value={jiraUrl} onChange={e=>setJiraUrl(e.target.value)} placeholder="https://your-domain.atlassian.net" />
