@@ -182,7 +182,7 @@ export default function TestScenarioAgentPage() {
           <div style={{ padding: '8px', background: 'rgba(139, 92, 246, 0.1)', borderRadius: '8px', color: '#8b5cf6' }}><FileText size={24} /></div>
           <div>
             Intelligent Test Scenario Agent
-            <p className="page-subtitle" style={{ margin: 0 }}>Generate test scenarios in CSV format from Jira or custom descriptions using AI</p>
+            <p className="page-subtitle" style={{ margin: 0 }}>Generate comprehensive test scenarios from Jira requirements or custom descriptions using AI</p>
           </div>
         </div>
         <button className="btn-secondary" style={{ display: 'flex', gap: '8px' }} onClick={() => {

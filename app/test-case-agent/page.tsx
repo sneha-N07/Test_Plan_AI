@@ -183,7 +183,7 @@ export default function TestCaseAgentPage() {
           <div style={{ padding: '8px', background: 'rgba(16, 185, 129, 0.1)', borderRadius: '8px', color: '#10b981' }}><FileText size={24} /></div>
           <div>
             Intelligent Test Case Agent
-            <p className="page-subtitle" style={{ margin: 0 }}>Generate test cases in CSV format from Jira or custom descriptions using AI</p>
+            <p className="page-subtitle" style={{ margin: 0 }}>Generate comprehensive test cases from Jira requirements or custom descriptions using AI</p>
           </div>
         </div>
         <button className="btn-secondary" style={{ display: 'flex', gap: '8px' }} onClick={() => {
