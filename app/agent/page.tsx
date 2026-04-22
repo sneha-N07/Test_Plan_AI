@@ -245,7 +245,9 @@ export default function AgentPage() {
               const blob = new Blob([testPlan], { type: 'text/markdown' });
               const url = URL.createObjectURL(blob);
               const a = document.createElement('a');
-              a.href = url; a.download = 'Test_Plan.md'; a.click();
+              const fileName = jiraTicketId ? `Test_Plan_${jiraTicketId}.md` : 'Test_Plan.md';
+              a.href = url; a.download = fileName; a.click();
+              URL.revokeObjectURL(url);
             }}><Download size={16}/> Download .md</button>}
           </div>
           
