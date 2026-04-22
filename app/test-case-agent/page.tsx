@@ -115,7 +115,7 @@ export default function TestCaseAgentPage() {
     try {
       setLoading(true);
       setTestCases(''); 
-      setStep(3); // Now the Test Cases step
+      setStep(2); // Now the Test Cases step
       
       let finalContext = '';
 
@@ -195,8 +195,8 @@ export default function TestCaseAgentPage() {
       </div>
 
       <div className="stepper glass-panel" style={{ padding: '0.5rem', marginBottom: '20px' }}>
-        {[1,2,3].map(s => {
-          const isClickable = s === 1 || (s === 2 && (jiraTicketId !== '' || context !== '' || step > 2)) || (s === 3 && testCases !== '');
+        {[1,2].map(s => {
+          const isClickable = s === 1 || (s === 2 && testCases !== '');
           return (
             <div 
               key={s} 
@@ -207,120 +207,13 @@ export default function TestCaseAgentPage() {
               }}
               onClick={() => { if (isClickable) setStep(s); }}
             >
-              {s}. {['Setup', 'Ticket Information', 'Test Cases'][s-1]}
+              {s}. {['Ticket Information', 'Test Cases'][s-1]}
             </div>
           );
         })}
       </div>
 
       {step === 1 && (
-        <div className="glass-panel">
-          <h3>Connection Setup</h3>
-          <p className="page-subtitle">Configure LLM and Jira (optional) settings</p>
-          <div style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem' }}>
-            
-            {/* LLM Connection First */}
-            <div style={{ padding: '1.5rem', border: '1px solid var(--border-color)', borderRadius: '8px' }}>
-              <div style={{ fontWeight: 'bold', marginBottom: '1rem', color: '#2563eb', display: 'flex', alignItems: 'center', gap: '8px' }}>
-                <Settings size={18} /> LLM Connection
-              </div>
-              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem' }}>
-                <div>
-                  <label className="label-field" style={{marginTop: 0}}>Provider</label>
-                  <select className="input-field" value={llmProvider} onChange={e=>setLlmProvider(e.target.value)}>
-                    <option value="Ollama">Ollama (Local)</option>
-                    <option value="GROQ">GROQ</option>
-                    <option value="Grok">Grok</option>
-                  </select>
-                </div>
-                <div>
-                  <label className="label-field" style={{marginTop: 0}}>Model Name</label>
-                  <input className="input-field" value={llmModel} onChange={e=>setLlmModel(e.target.value)} placeholder="e.g. llama-3.3-70b-versatile"/>
-                </div>
-              </div>
-
-              <label className="label-field">API Key / Base URL (If needed)</label>
-              <input className="input-field" type="password" value={llmKey || llmBaseUrl} onChange={e=>{
-                if(llmProvider==='Ollama') setLlmBaseUrl(e.target.value); else setLlmKey(e.target.value);
-              }} placeholder="Token or http://localhost:11434" />
-              
-              <button 
-                className="btn-primary" 
-                style={{ marginTop: '1.5rem', width: '100%', backgroundColor: '#2563eb' }} 
-                onClick={testLlm} 
-                disabled={loading}
-              >
-                {loading ? 'Testing...' : 'Test LLM Connection'}
-              </button>
-              
-              {llmTestStatus && (
-                <div style={{ 
-                  marginTop: '0.75rem', 
-                  padding: '0.5rem',
-                  borderRadius: '6px',
-                  backgroundColor: llmTestSuccess === true ? 'rgba(16, 185, 129, 0.1)' : llmTestSuccess === false ? 'rgba(239, 68, 68, 0.1)' : 'rgba(0,0,0,0.05)',
-                  color: llmTestSuccess === true ? '#10b981' : llmTestSuccess === false ? 'var(--error-color)' : 'var(--text-secondary)',
-                  fontSize: '13px',
-                  fontWeight: '500'
-                }}>
-                  {llmTestStatus}
-                </div>
-              )}
-            </div>
-
-            {/* Jira Connection Below */}
-            <div style={{ padding: '1.5rem', border: '1px solid var(--border-color)', borderRadius: '8px' }}>
-              <div style={{ fontWeight: 'bold', marginBottom: '1rem', color: '#2563eb', display: 'flex', alignItems: 'center', gap: '8px' }}>
-                <Briefcase size={18} /> Jira Connection (Optional here)
-              </div>
-              <label className="label-field" style={{marginTop: 0}}>Jira URL</label>
-              <input className="input-field" value={jiraUrl} onChange={e=>setJiraUrl(e.target.value)} />
-              
-              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem' }}>
-                <div>
-                  <label className="label-field">Jira Email</label>
-                  <input className="input-field" value={jiraEmail} onChange={e=>setJiraEmail(e.target.value)} />
-                </div>
-                <div>
-                  <label className="label-field">API Token</label>
-                  <input type="password" className="input-field" value={jiraToken} onChange={e=>setJiraToken(e.target.value)} />
-                </div>
-              </div>
-              
-              <button 
-                className="btn-primary" 
-                style={{ marginTop: '1.5rem', width: '100%', backgroundColor: '#2563eb' }} 
-                onClick={testJira} 
-                disabled={loading}
-              >
-                {loading ? 'Testing...' : 'Test Jira Connection'}
-              </button>
-              
-              {jiraTestStatus && (
-                <div style={{ 
-                  marginTop: '0.75rem', 
-                  padding: '0.5rem',
-                  borderRadius: '6px',
-                  backgroundColor: jiraTestSuccess === true ? 'rgba(16, 185, 129, 0.1)' : jiraTestSuccess === false ? 'rgba(239, 68, 68, 0.1)' : 'rgba(0,0,0,0.05)',
-                  color: jiraTestSuccess === true ? '#10b981' : jiraTestSuccess === false ? 'var(--error-color)' : 'var(--text-secondary)',
-                  fontSize: '13px',
-                  fontWeight: '500'
-                }}>
-                  {jiraTestStatus}
-                </div>
-              )}
-            </div>
-          </div>
-
-          <div style={{ marginTop: '2rem', display: 'flex', justifyContent: 'flex-end', alignItems: 'center', gap: '1rem' }}>
-            {saveStatus && <div style={{ color: '#10b981', fontSize: '14px', fontWeight: '500' }}>{saveStatus}</div>}
-            <button className="btn-secondary" onClick={saveSettings}>Save Settings</button>
-            <button className="btn-primary" onClick={() => setStep(2)}>Continue to Details</button>
-          </div>
-        </div>
-      )}
-
-      {step === 2 && (
         <div className="glass-panel">
           <h3>Ticket Information</h3>
           <p className="page-subtitle">Provide the Jira ticket ID (optional) OR custom descriptions</p>
@@ -336,17 +229,14 @@ export default function TestCaseAgentPage() {
           <textarea className="input-field" rows={4} value={context} onChange={e=>setContext(e.target.value)} placeholder="Add feature details, specific testing focus, constraints..." />
 
           <div style={{ marginTop: '2rem', display: 'flex', gap: '1rem' }}>
-            <button className="btn-secondary" style={{ flex: 1 }} onClick={() => setStep(1)} disabled={loading}>
-               Back to Setup
-            </button>
-            <button className="btn-primary" style={{ flex: 2 }} onClick={generateTestCases} disabled={(!jiraTicketId && !context) || loading}>
+            <button className="btn-primary" style={{ width: '100%' }} onClick={generateTestCases} disabled={(!jiraTicketId && !context) || loading}>
                {loading ? <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}><Loader2 className="animate-spin" /> Processing...</div> : 'Generate Test Cases'}
             </button>
           </div>
         </div>
       )}
 
-      {step === 3 && (
+      {step === 2 && (
         <div className="glass-panel">
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '2rem' }}>
             <h3>Finalized Test Cases (CSV format)</h3>
@@ -388,7 +278,7 @@ export default function TestCaseAgentPage() {
                 {testCases}
               </div>
               <div style={{ display: 'flex', justifyContent: 'flex-start' }}>
-                <button className="btn-secondary" onClick={() => setStep(2)}>
+                <button className="btn-secondary" onClick={() => setStep(1)}>
                   Back to Ticket Information
                 </button>
               </div>

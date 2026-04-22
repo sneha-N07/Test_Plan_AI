@@ -3,11 +3,12 @@
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { LayoutDashboard, Users, Settings, Briefcase, ChevronDown, X, ExternalLink, Mail, ShieldCheck, FileText, Target } from 'lucide-react';
+import { LayoutDashboard, Users, Settings, Briefcase, ChevronDown, ChevronRight, X, ExternalLink, Mail, ShieldCheck, FileText, Target } from 'lucide-react';
 
 export default function Sidebar() {
   const pathname = usePathname();
   const [isProfileOpen, setIsProfileOpen] = useState(false);
+  const [isPlanningExpanded, setIsPlanningExpanded] = useState(true);
   
   // Profile settings
   const [editedName, setEditedName] = useState('');
@@ -182,30 +183,37 @@ export default function Sidebar() {
           );
         })}
 
-        <div style={{ marginTop: '20px', fontSize: '12px', fontWeight: '600', textTransform: 'uppercase', marginBottom: '10px', opacity: 0.5, display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-          PLANNING & STRATEGY <ChevronDown size={14} />
+        <div 
+          onClick={() => setIsPlanningExpanded(!isPlanningExpanded)}
+          style={{ marginTop: '20px', fontSize: '12px', fontWeight: '600', textTransform: 'uppercase', marginBottom: '10px', opacity: 0.5, display: 'flex', justifyContent: 'space-between', alignItems: 'center', cursor: 'pointer' }}
+        >
+          PLANNING & STRATEGY {isPlanningExpanded ? <ChevronDown size={14} /> : <ChevronRight size={14} />}
         </div>
         
-        <Link href="/agent" style={{ textDecoration: 'none', color: 'inherit' }}>
-          <div className={`sidebar-item ${pathname === '/agent' ? 'active' : ''}`} style={{ color: 'white' }}>
-            <Briefcase size={18} color="#ef4444" /> Intelligent Test Planning Agent
-          </div>
-        </Link>
-        <Link href="/test-scenario-agent" style={{ textDecoration: 'none', color: 'inherit' }}>
-          <div className={`sidebar-item ${pathname === '/test-scenario-agent' ? 'active' : ''}`} style={{ color: 'white' }}>
-            <FileText size={18} color="#8b5cf6" /> Intelligent Test Scenario Agent
-          </div>
-        </Link>
-        <Link href="/test-strategy-agent" style={{ textDecoration: 'none', color: 'inherit' }}>
-          <div className={`sidebar-item ${pathname === '/test-strategy-agent' ? 'active' : ''}`} style={{ color: 'white' }}>
-            <Target size={18} color="#eab308" /> Intelligent Test Strategy Agent
-          </div>
-        </Link>
-        <Link href="/test-case-agent" style={{ textDecoration: 'none', color: 'inherit' }}>
-          <div className={`sidebar-item ${pathname === '/test-case-agent' ? 'active' : ''}`} style={{ color: 'white' }}>
-            <FileText size={18} color="#10b981" /> Intelligent Test Case Agent
-          </div>
-        </Link>
+        {isPlanningExpanded && (
+          <>
+            <Link href="/test-case-agent" style={{ textDecoration: 'none', color: 'inherit' }}>
+              <div className={`sidebar-item ${pathname === '/test-case-agent' ? 'active' : ''}`} style={{ color: 'white' }}>
+                <FileText size={18} color="#10b981" /> Intelligent Test Case Agent
+              </div>
+            </Link>
+            <Link href="/agent" style={{ textDecoration: 'none', color: 'inherit' }}>
+              <div className={`sidebar-item ${pathname === '/agent' ? 'active' : ''}`} style={{ color: 'white' }}>
+                <Briefcase size={18} color="#ef4444" /> Intelligent Test Planning Agent
+              </div>
+            </Link>
+            <Link href="/test-scenario-agent" style={{ textDecoration: 'none', color: 'inherit' }}>
+              <div className={`sidebar-item ${pathname === '/test-scenario-agent' ? 'active' : ''}`} style={{ color: 'white' }}>
+                <FileText size={18} color="#8b5cf6" /> Intelligent Test Scenario Agent
+              </div>
+            </Link>
+            <Link href="/test-strategy-agent" style={{ textDecoration: 'none', color: 'inherit' }}>
+              <div className={`sidebar-item ${pathname === '/test-strategy-agent' ? 'active' : ''}`} style={{ color: 'white' }}>
+                <Target size={18} color="#eab308" /> Intelligent Test Strategy Agent
+              </div>
+            </Link>
+          </>
+        )}
       </aside>
 
       {/* Profile Modal */}

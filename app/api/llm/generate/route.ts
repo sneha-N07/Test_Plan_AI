@@ -10,25 +10,35 @@ export async function POST(request: Request) {
       return NextResponse.json({ success: false, error: 'Missing required parameters' }, { status: 400 });
     }
 
-    // Read the template file from the server
-    const templatePath = path.join(process.cwd(), 'test_plan_template', 'template.txt');
-    let templateText = 'No template found.';
-    try {
-      templateText = fs.readFileSync(templatePath, 'utf8');
-    } catch (e) {
-      console.warn("Could not read template.txt at", templatePath);
-    }
+    // Read the template files from the server
+    const templatesDir = path.join(process.cwd(), 'test_templates');
+    let testPlanTemplate = '';
+    let testScenariosTemplate = '';
+    let testCasesTemplate = '';
+
+    try { testPlanTemplate = fs.readFileSync(path.join(templatesDir, 'test_plan.md'), 'utf8'); } catch (e) { console.warn("Could not read test_plan.md"); }
+    try { testScenariosTemplate = fs.readFileSync(path.join(templatesDir, 'VWO_Login_Page_Test_Scenarios.md'), 'utf8'); } catch (e) { console.warn("Could not read VWO_Login_Page_Test_Scenarios.md"); }
+    try { testCasesTemplate = fs.readFileSync(path.join(templatesDir, 'VWO_Login_Page_Test_Cases.md'), 'utf8'); } catch (e) { console.warn("Could not read VWO_Login_Page_Test_Cases.md"); }
 
     const systemPrompt = `You are an expert QA Software Engineer.
-Your task is to generate a comprehensive Test Plan for the following Jira Feature/Issues based on the provided Template format.
+Your task is to generate comprehensive QA documentation based on the Jira Feature/Issues provided.
+You MUST generate a Test Plan, Test Scenarios, and Test Cases. 
+CRITICAL: You MUST strictly adhere to the structural formats (headers, tables, columns) provided in the templates below. The VWO examples in the templates are just to show you the expected format and level of detail. Do NOT copy the VWO test cases; instead, generate new ones for the provided Jira context using the exact same formatting.
+
 Do NOT hallucinate features. Strictly stick to the Jira context and additional notes provided.
 Return ONLY valid Markdown.
 
 ### JIRA AND ADDITIONAL CONTEXT:
 ${context}
 
-### REQUIRED TEST PLAN TEMPLATE:
-${templateText}`;
+### REQUIRED FORMAT FOR TEST PLAN:
+${testPlanTemplate}
+
+### REQUIRED FORMAT FOR TEST SCENARIOS (Use this structure):
+${testScenariosTemplate}
+
+### REQUIRED FORMAT FOR TEST CASES (Use this exact tabular format):
+${testCasesTemplate}`;
 
     let generateUrl = '';
     let headers: any = { 'Content-Type': 'application/json' };
